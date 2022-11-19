@@ -40,12 +40,28 @@ private:
   float m_truckSpeed{};
   float m_panSpeed{};
 
+  struct Dragon {
+    glm::vec3 position{};
+    float angle{};
+  };
+
+  float scale{};
+  float height{};
+
+  std::array<Dragon, 4> dragons;
+
+  int startGame{0};
+  float MovementVelocity{0.5f};
+  float RotationVelocity{50.0f};
+
   Ground m_ground;
 
   std::vector<Vertex> m_vertices;
   std::vector<GLuint> m_indices;
 
   void loadModelFromFile(std::string_view path);
+  void drawDragon(int i, float color_r, float color_g, float color_b);
+  void updateDragonPosition(int i);
 };
 
 #endif
