@@ -555,5 +555,5 @@ Os arquivos **lookat.frag**, **lookat.vert**, **camera.hpp**, **camera.cpp**, **
 
 O arquivo **dragon.obj** foi encontrado no seguinte endereço: https://github.com/cgibson/OpenGL-Examples/blob/master/models/dragon.obj
 
-#### Página Web com Aplicaç
+#### Página Web com Aplicação 
 https://jeffersonrodrigues7.github.io/atv-03-web/
