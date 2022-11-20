@@ -35,25 +35,40 @@ private:
   GLint m_modelMatrixLocation{};
   GLint m_colorLocation{};
 
+  // Definindo camera e variáveis que a controlam
   Camera m_camera;
   float m_dollySpeed{};
   float m_truckSpeed{};
   float m_panSpeed{};
 
+  // A struct do Dragão vai possuir o vetor posição e o ângulo dele
   struct Dragon {
     glm::vec3 position{};
     float angle{};
   };
 
+  /*
+   *Abaixo estão respectivamente as variáveis que vão controlar a escala e a
+   *altura dos dragões.
+   */
   float scale{};
   float height{};
 
+  // Criando o array de dragões
   std::array<Dragon, 4> dragons;
 
+  /*
+   *Variável pause, se startGame for 0 o jogo está pausado, se startGame for 1
+   *o jogo está rodando
+   */
   int startGame{0};
+
+  /* As variáveis abaixo alteram respectivamente a velocidade de movimento e
+   */
   float MovementVelocity{0.5f};
   float RotationVelocity{50.0f};
 
+  // Objeto que desenha o chão
   Ground m_ground;
 
   std::vector<Vertex> m_vertices;
