@@ -108,11 +108,28 @@ void Window::onCreate() {
   // End of binding to current VAO
   abcg::glBindVertexArray(0);
 
+  scale = 0.1f;
+  height = 0.0f;
+
   dragons[0].position.x = -2.0f;
-  dragons[0].position.y = 0.0f;
+  dragons[0].position.y = height;
   dragons[0].position.z = 2.0f;
   dragons[0].angle = 180.0f;
-  dragons[0].scale = 0.1f;
+
+  dragons[1].position.x = 2.0f;
+  dragons[1].position.y = height;
+  dragons[1].position.z = 2.0f;
+  dragons[1].angle = 270.0f;
+
+  dragons[2].position.x = 2.0f;
+  dragons[2].position.y = height;
+  dragons[2].position.z = -2.0f;
+  dragons[2].angle = 360.0f;
+
+  dragons[3].position.x = -2.0f;
+  dragons[3].position.y = height;
+  dragons[3].position.z = -2.0f;
+  dragons[3].angle = 90.0f;
 }
 
 void Window::loadModelFromFile(std::string_view path) {
@@ -184,49 +201,10 @@ void Window::onPaint() {
 
   abcg::glBindVertexArray(m_VAO);
 
-  // Draw white bunny
-  glm::mat4 model{1.0f};
-  model = glm::translate(model,
-                         glm::vec3(dragons[0].position.x, dragons[0].position.y,
-                                   dragons[0].position.z));
-  model =
-      glm::rotate(model, glm::radians(dragons[0].angle), glm::vec3(0, 1, 0));
-  model = glm::scale(model, glm::vec3(dragons[0].scale));
-
-  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  abcg::glUniform4f(m_colorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-                       nullptr);
-
-  // Draw yellow bunny
-  // model = glm::mat4(1.0);
-  // model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f));
-  // model = glm::scale(model, glm::vec3(0.5f));
-
-  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  // abcg::glUniform4f(m_colorLocation, 1.0f, 0.8f, 0.0f, 1.0f);
-  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-  //                      nullptr);
-
-  // Draw blue bunny
-  // model = glm::mat4(1.0);
-  // model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
-  // model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0, 1, 0));
-  // model = glm::scale(model, glm::vec3(0.5f));
-
-  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  // abcg::glUniform4f(m_colorLocation, 0.0f, 0.8f, 1.0f, 1.0f);
-  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-  //                      nullptr);
-
-  // Draw red bunny
-  // model = glm::mat4(1.0);
-  // model = glm::scale(model, glm::vec3(0.1f));
-
-  // abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
-  // abcg::glUniform4f(m_colorLocation, 1.0f, 0.25f, 0.25f, 1.0f);
-  // abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
-  //                      nullptr);
+  drawDragon(0, 1.0f, 1.0f, 1.0f);
+  drawDragon(1, 0.0f, 1.0f, 1.0f);
+  drawDragon(2, 1.0f, 0.0f, 1.0f);
+  drawDragon(3, 1.0f, 1.0f, 0.0f);
 
   abcg::glBindVertexArray(0);
 
@@ -245,18 +223,13 @@ void Window::onPaintUI() {
   ImGui::Begin("Widget window", nullptr, ImGuiWindowFlags_NoDecoration);
 
   {
-    ImGui::Text("%s", std::to_string(dragons[0].position.x).c_str());
-    ImGui::Text("%s", std::to_string(dragons[0].position.z).c_str());
-    ImGui::Text("%s", std::to_string(dragons[0].angle).c_str());
     ImGui::RadioButton("start", &startGame, 1);
     ImGui::SameLine();
     ImGui::RadioButton("pause", &startGame, 0);
     ImGui::SliderFloat("Vel. Movimento", &MovementVelocity, 0.0f, 5.0f, "%.1f");
     ImGui::SliderFloat("Vel. Rotação", &RotationVelocity, 0.0f, 200.0f, "%.1f");
-
-    // ImGui::Text("%s", std::to_string(m_camera.m_eye.x).c_str());
-    // ImGui::Text("%s", std::to_string(m_camera.m_eye.y).c_str());
-    // ImGui::Text("%s", std::to_string(m_camera.m_eye.z).c_str());
+    ImGui::SliderFloat("Escala", &scale, 0.1f, 0.2f, "%.2f");
+    ImGui::SliderFloat("Altura", &height, 0.0f, 1.0f, "%.2f");
   }
   ImGui::End();
 }
@@ -276,12 +249,33 @@ void Window::onDestroy() {
 }
 
 void Window::onUpdate() {
+  updateDragonPosition(0);
+  updateDragonPosition(1);
+  updateDragonPosition(2);
+  updateDragonPosition(3);
+}
+
+void Window::drawDragon(int i, float color_r, float color_g, float color_b) {
+  glm::mat4 model{1.0f};
+  model = glm::translate(
+      model, glm::vec3(dragons[i].position.x, height, dragons[i].position.z));
+  model =
+      glm::rotate(model, glm::radians(dragons[i].angle), glm::vec3(0, 1, 0));
+  model = glm::scale(model, glm::vec3(scale));
+
+  abcg::glUniformMatrix4fv(m_modelMatrixLocation, 1, GL_FALSE, &model[0][0]);
+  abcg::glUniform4f(m_colorLocation, color_r, color_g, color_b, 1.0f);
+  abcg::glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT,
+                       nullptr);
+}
+
+void Window::updateDragonPosition(int i) {
   auto const deltaTime{gsl::narrow_cast<float>(getDeltaTime())};
 
   if (startGame) {
-    float X = dragons[0].position.x;
-    float Z = dragons[0].position.z;
-    float A = dragons[0].angle;
+    float X = dragons[i].position.x;
+    float Z = dragons[i].position.z;
+    float A = dragons[i].angle;
 
     // Rotacionando no Ponto A
     if (X <= -2 && Z >= 2 && A <= 180.0f) {
@@ -328,9 +322,9 @@ void Window::onUpdate() {
       Z += deltaTime * MovementVelocity;
     }
 
-    dragons[0].position.x = X;
-    dragons[0].position.z = Z;
-    dragons[0].angle = A;
+    dragons[i].position.x = X;
+    dragons[i].position.z = Z;
+    dragons[i].angle = A;
   }
 
   // Update LookAt camera
