@@ -9,7 +9,7 @@
 ### O que é
 
 O projeto simula a movimentação de 4 dragões ao redor do ponto (0,0,0).
-O usuário poderá modificar a escala e as velocidades de movimento e rotação dos dragões através de sliders. A opção de pause está disponível.
+O usuário poderá modificar a escala, a altura e as velocidades de movimento e rotação dos dragões através de sliders. A opção de pause está disponível.
 Também será possível movimentar a camera do usuário através do campo.
 Tomou-se como base o projeto LookAt.
 
